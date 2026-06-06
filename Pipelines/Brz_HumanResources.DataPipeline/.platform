@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "Brz_HumanResources"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "43a0b375-dd9f-92d9-4578-5f8df2674d4c"
+  }
+}

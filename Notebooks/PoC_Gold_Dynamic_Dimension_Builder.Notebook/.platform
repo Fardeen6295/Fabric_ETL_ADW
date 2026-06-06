@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Notebook",
+    "displayName": "PoC_Gold_Dynamic_Dimension_Builder",
+    "description": ""
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "ef00c21f-5919-8219-4f41-22b24bbca91d"
+  }
+}

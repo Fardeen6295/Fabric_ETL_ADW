@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "Brz_Sales"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "9f28265b-b49b-afc7-4040-b0bd7f07dd9a"
+  }
+}

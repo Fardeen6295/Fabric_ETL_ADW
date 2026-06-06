@@ -1,0 +1,992 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "LakehouseTableSource"
+          },
+          "datasetSettings": {
+            "type": "LakehouseTable",
+            "typeProperties": {
+              "schema": "dbo",
+              "table": "ingestionconfig"
+            },
+            "schema": [],
+            "linkedService": {
+              "name": "AdvWrk_LKH",
+              "properties": {
+                "type": "Lakehouse",
+                "typeProperties": {
+                  "artifactId": "4aa0f858-f98f-9c2a-4f9f-16469eb80d3a",
+                  "workspaceId": "00000000-0000-0000-0000-000000000000",
+                  "rootFolder": "Tables"
+                },
+                "annotations": []
+              }
+            },
+            "annotations": []
+          },
+          "firstRowOnly": false
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "ingest_sales",
+        "dependsOn": []
+      },
+      {
+        "type": "SetVariable",
+        "typeProperties": {
+          "variableName": "current_timestamp",
+          "value": {
+            "value": "@utcNow()",
+            "type": "Expression"
+          }
+        },
+        "policy": {
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "current_timestamp_sales",
+        "dependsOn": []
+      },
+      {
+        "type": "ForEach",
+        "typeProperties": {
+          "items": {
+            "value": "@activity('ingest_sales').output.value",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "type": "IfCondition",
+              "typeProperties": {
+                "expression": {
+                  "value": "@equals(item().IsActive,true) ",
+                  "type": "Expression"
+                },
+                "ifTrueActivities": [
+                  {
+                    "type": "Copy",
+                    "typeProperties": {
+                      "source": {
+                        "type": "SqlServerSource",
+                        "sqlReaderQuery": {
+                          "value": "SELECT * FROM @{item().SchemaName}.@{item().TableName} WHERE @{item().CdcCol} >= '@{item().LastLoad}'",
+                          "type": "Expression"
+                        },
+                        "partitionOption": "None",
+                        "queryTimeout": "02:00:00",
+                        "datasetSettings": {
+                          "type": "SqlServerTable",
+                          "typeProperties": {
+                            "database": "AdventureWorks"
+                          },
+                          "schema": [],
+                          "externalReferences": {
+                            "connection": "c5a2a566-5e67-46b1-b643-c2676b395009"
+                          },
+                          "annotations": []
+                        }
+                      },
+                      "sink": {
+                        "type": "ParquetSink",
+                        "formatSettings": {
+                          "type": "ParquetWriteSettings",
+                          "enableVertiParquet": true
+                        },
+                        "storeSettings": {
+                          "type": "AzureBlobStorageWriteSettings"
+                        },
+                        "datasetSettings": {
+                          "type": "Parquet",
+                          "typeProperties": {
+                            "location": {
+                              "type": "LakehouseLocation",
+                              "folderPath": {
+                                "value": "@item().SinkPath",
+                                "type": "Expression"
+                              },
+                              "fileName": {
+                                "value": "@concat(item().TableName,'.parquet')",
+                                "type": "Expression"
+                              }
+                            },
+                            "compressionCodec": "snappy"
+                          },
+                          "schema": [],
+                          "linkedService": {
+                            "name": "AdvWrk_LKH",
+                            "properties": {
+                              "type": "Lakehouse",
+                              "typeProperties": {
+                                "artifactId": "9eb80d3a-1646-4f9f-9c2a-f98f4aa0f858",
+                                "workspaceId": "39569afe-3f7e-4b65-8e1e-0e502ac5b583",
+                                "rootFolder": "Files"
+                              },
+                              "annotations": []
+                            }
+                          },
+                          "annotations": []
+                        }
+                      },
+                      "translator": {
+                        "type": "TabularTranslator",
+                        "typeConversion": true,
+                        "typeConversionSettings": {
+                          "allowDataTruncation": true,
+                          "treatBooleanAsNumber": false
+                        }
+                      },
+                      "enableStaging": false
+                    },
+                    "policy": {
+                      "timeout": "0.12:00:00",
+                      "retry": 0,
+                      "retryIntervalInSeconds": 30,
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "onprem_to_onelake",
+                    "state": "Inactive",
+                    "onInactiveMarkAs": "Succeeded",
+                    "dependsOn": [
+                      {
+                        "activity": "Script1",
+                        "dependencyConditions": [
+                          "Succeeded"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Script",
+                    "typeProperties": {
+                      "scripts": [
+                        {
+                          "text": {
+                            "value": "SELECT count(*) cnt FROM @{item().SchemaName}.@{item().TableName} WHERE @{item().CdcCol} >= '@{item().LastLoad}'",
+                            "type": "Expression"
+                          },
+                          "type": "Query"
+                        }
+                      ],
+                      "scriptBlockExecutionTimeout": "02:00:00"
+                    },
+                    "externalReferences": {
+                      "connection": "f72e7378-6db3-4f07-9a0b-4b05f397a266"
+                    },
+                    "policy": {
+                      "timeout": "0.12:00:00",
+                      "retry": 0,
+                      "retryIntervalInSeconds": 30,
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "Script1",
+                    "dependsOn": []
+                  }
+                ],
+                "ifFalseActivities": []
+              },
+              "name": "If Condition1",
+              "dependsOn": []
+            }
+          ]
+        },
+        "name": "all_sales_tbls",
+        "dependsOn": [
+          {
+            "activity": "ingest_sales",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          },
+          {
+            "activity": "current_timestamp_sales",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "SqlServerSource",
+            "sqlReaderQuery": {
+              "value": "SELECT * FROM AdvWrk_LKH.dbo.ingestionconfig\nWHERE SchemaName = 'HumanResources'\nAND\nIsActive = 1",
+              "type": "Expression"
+            },
+            "partitionOption": "None",
+            "queryTimeout": "02:00:00"
+          },
+          "datasetSettings": {
+            "type": "SqlServerTable",
+            "typeProperties": {
+              "database": "AdvWrk_LKH"
+            },
+            "schema": [],
+            "externalReferences": {
+              "connection": "2d65571c-d063-4072-97e3-ef2c1062f3d0"
+            },
+            "annotations": []
+          },
+          "firstRowOnly": false
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "ingest_hr",
+        "state": "Inactive",
+        "onInactiveMarkAs": "Succeeded",
+        "dependsOn": [
+          {
+            "activity": "all_production_tbls",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "SetVariable",
+        "typeProperties": {
+          "variableName": "current_timestamp",
+          "value": {
+            "value": "@utcNow()",
+            "type": "Expression"
+          }
+        },
+        "policy": {
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "current_timestamp_hr",
+        "dependsOn": [
+          {
+            "activity": "all_production_tbls",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "ForEach",
+        "typeProperties": {
+          "items": {
+            "value": "@activity('ingest_hr').output.value",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "type": "IfCondition",
+              "typeProperties": {
+                "expression": {
+                  "value": "@equals(item().IsActive,true) ",
+                  "type": "Expression"
+                },
+                "ifTrueActivities": [
+                  {
+                    "type": "Copy",
+                    "typeProperties": {
+                      "source": {
+                        "type": "SqlServerSource",
+                        "sqlReaderQuery": {
+                          "value": "SELECT * FROM @{item().SchemaName}.@{item().TableName}",
+                          "type": "Expression"
+                        },
+                        "partitionOption": "None",
+                        "queryTimeout": "02:00:00",
+                        "datasetSettings": {
+                          "type": "SqlServerTable",
+                          "typeProperties": {
+                            "database": "AdventureWorks"
+                          },
+                          "schema": [],
+                          "externalReferences": {
+                            "connection": "c5a2a566-5e67-46b1-b643-c2676b395009"
+                          },
+                          "annotations": []
+                        }
+                      },
+                      "sink": {
+                        "type": "ParquetSink",
+                        "formatSettings": {
+                          "type": "ParquetWriteSettings",
+                          "enableVertiParquet": true
+                        },
+                        "storeSettings": {
+                          "type": "LakehouseWriteSettings"
+                        },
+                        "datasetSettings": {
+                          "type": "Parquet",
+                          "typeProperties": {
+                            "location": {
+                              "type": "LakehouseLocation",
+                              "folderPath": {
+                                "value": "@item().SinkPath",
+                                "type": "Expression"
+                              },
+                              "fileName": {
+                                "value": "@concat(item().TableName,'.parquet')",
+                                "type": "Expression"
+                              }
+                            },
+                            "compressionCodec": "snappy"
+                          },
+                          "schema": [],
+                          "linkedService": {
+                            "name": "AdvWrk_LKH",
+                            "properties": {
+                              "type": "Lakehouse",
+                              "typeProperties": {
+                                "artifactId": "4aa0f858-f98f-9c2a-4f9f-16469eb80d3a",
+                                "workspaceId": "00000000-0000-0000-0000-000000000000",
+                                "rootFolder": "Files"
+                              },
+                              "annotations": []
+                            }
+                          },
+                          "annotations": []
+                        }
+                      },
+                      "translator": {
+                        "type": "TabularTranslator",
+                        "typeConversion": true,
+                        "typeConversionSettings": {
+                          "allowDataTruncation": true,
+                          "treatBooleanAsNumber": false
+                        }
+                      },
+                      "enableStaging": false
+                    },
+                    "policy": {
+                      "timeout": "0.12:00:00",
+                      "retry": 0,
+                      "retryIntervalInSeconds": 30,
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "onprem_to_onelake_copy1",
+                    "dependsOn": []
+                  }
+                ],
+                "ifFalseActivities": []
+              },
+              "name": "If Condition1_copy1",
+              "dependsOn": []
+            }
+          ]
+        },
+        "name": "all_hr_tbls",
+        "dependsOn": [
+          {
+            "activity": "ingest_hr",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          },
+          {
+            "activity": "current_timestamp_hr",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "SqlServerSource",
+            "sqlReaderQuery": {
+              "value": "SELECT * FROM AdvWrk_LKH.dbo.ingestionconfig\nWHERE SchemaName = 'Purchasing'\nAND\nIsActive = 1",
+              "type": "Expression"
+            },
+            "partitionOption": "None",
+            "queryTimeout": "02:00:00"
+          },
+          "datasetSettings": {
+            "type": "SqlServerTable",
+            "typeProperties": {
+              "database": "AdvWrk_LKH"
+            },
+            "schema": [],
+            "externalReferences": {
+              "connection": "2d65571c-d063-4072-97e3-ef2c1062f3d0"
+            },
+            "annotations": []
+          },
+          "firstRowOnly": false
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "ingest_purchasing",
+        "state": "Inactive",
+        "onInactiveMarkAs": "Succeeded",
+        "dependsOn": [
+          {
+            "activity": "all_sales_tbls",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "SetVariable",
+        "typeProperties": {
+          "variableName": "current_timestamp",
+          "value": {
+            "value": "@utcNow()",
+            "type": "Expression"
+          }
+        },
+        "policy": {
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "current_timestamp_purchasing",
+        "dependsOn": [
+          {
+            "activity": "all_sales_tbls",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "ForEach",
+        "typeProperties": {
+          "items": {
+            "value": "@activity('ingest_purchasing').output.value",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "type": "IfCondition",
+              "typeProperties": {
+                "expression": {
+                  "value": "@equals(item().IsActive,true) ",
+                  "type": "Expression"
+                },
+                "ifTrueActivities": [
+                  {
+                    "type": "Copy",
+                    "typeProperties": {
+                      "source": {
+                        "type": "SqlServerSource",
+                        "sqlReaderQuery": {
+                          "value": "SELECT * FROM @{item().SchemaName}.@{item().TableName}",
+                          "type": "Expression"
+                        },
+                        "partitionOption": "None",
+                        "queryTimeout": "02:00:00",
+                        "datasetSettings": {
+                          "type": "SqlServerTable",
+                          "typeProperties": {
+                            "database": "AdventureWorks"
+                          },
+                          "schema": [],
+                          "externalReferences": {
+                            "connection": "c5a2a566-5e67-46b1-b643-c2676b395009"
+                          },
+                          "annotations": []
+                        }
+                      },
+                      "sink": {
+                        "type": "ParquetSink",
+                        "formatSettings": {
+                          "type": "ParquetWriteSettings",
+                          "enableVertiParquet": true
+                        },
+                        "storeSettings": {
+                          "type": "LakehouseWriteSettings"
+                        },
+                        "datasetSettings": {
+                          "type": "Parquet",
+                          "typeProperties": {
+                            "location": {
+                              "type": "LakehouseLocation",
+                              "folderPath": {
+                                "value": "@item().SinkPath",
+                                "type": "Expression"
+                              },
+                              "fileName": {
+                                "value": "@concat(item().TableName,'.parquet')",
+                                "type": "Expression"
+                              }
+                            },
+                            "compressionCodec": "snappy"
+                          },
+                          "schema": [],
+                          "linkedService": {
+                            "name": "AdvWrk_LKH",
+                            "properties": {
+                              "type": "Lakehouse",
+                              "typeProperties": {
+                                "artifactId": "9eb80d3a-1646-4f9f-9c2a-f98f4aa0f858",
+                                "workspaceId": "39569afe-3f7e-4b65-8e1e-0e502ac5b583",
+                                "rootFolder": "Files"
+                              },
+                              "annotations": []
+                            }
+                          },
+                          "annotations": []
+                        }
+                      },
+                      "translator": {
+                        "type": "TabularTranslator",
+                        "typeConversion": true,
+                        "typeConversionSettings": {
+                          "allowDataTruncation": true,
+                          "treatBooleanAsNumber": false
+                        }
+                      },
+                      "enableStaging": false
+                    },
+                    "policy": {
+                      "timeout": "0.12:00:00",
+                      "retry": 0,
+                      "retryIntervalInSeconds": 30,
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "onprem_to_onelake_copy1_copy1",
+                    "dependsOn": []
+                  }
+                ],
+                "ifFalseActivities": []
+              },
+              "name": "If Condition1_copy1_copy1",
+              "dependsOn": []
+            }
+          ]
+        },
+        "name": "all_purchasing_tbls",
+        "state": "Inactive",
+        "onInactiveMarkAs": "Succeeded",
+        "dependsOn": [
+          {
+            "activity": "ingest_purchasing",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          },
+          {
+            "activity": "current_timestamp_purchasing",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "SqlServerSource",
+            "sqlReaderQuery": {
+              "value": "SELECT * FROM AdvWrk_LKH.dbo.ingestionconfig\nWHERE SchemaName = 'Person'\nAND\nIsActive = 1",
+              "type": "Expression"
+            },
+            "partitionOption": "None",
+            "queryTimeout": "02:00:00"
+          },
+          "datasetSettings": {
+            "type": "SqlServerTable",
+            "typeProperties": {
+              "database": "AdvWrk_LKH"
+            },
+            "schema": [],
+            "externalReferences": {
+              "connection": "2d65571c-d063-4072-97e3-ef2c1062f3d0"
+            },
+            "annotations": []
+          },
+          "firstRowOnly": false
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "ingest_person",
+        "dependsOn": [
+          {
+            "activity": "all_purchasing_tbls",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "SetVariable",
+        "typeProperties": {
+          "variableName": "current_timestamp",
+          "value": {
+            "value": "@utcNow()",
+            "type": "Expression"
+          }
+        },
+        "policy": {
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "current_timestamp_person",
+        "dependsOn": [
+          {
+            "activity": "all_purchasing_tbls",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "ForEach",
+        "typeProperties": {
+          "items": {
+            "value": "@activity('ingest_person').output.value",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "type": "IfCondition",
+              "typeProperties": {
+                "expression": {
+                  "value": "@equals(item().IsActive,true) ",
+                  "type": "Expression"
+                },
+                "ifTrueActivities": [
+                  {
+                    "type": "Copy",
+                    "typeProperties": {
+                      "source": {
+                        "type": "SqlServerSource",
+                        "sqlReaderQuery": {
+                          "value": "SELECT * FROM @{item().SchemaName}.@{item().TableName}",
+                          "type": "Expression"
+                        },
+                        "partitionOption": "None",
+                        "queryTimeout": "02:00:00",
+                        "datasetSettings": {
+                          "type": "SqlServerTable",
+                          "typeProperties": {
+                            "database": "AdventureWorks"
+                          },
+                          "schema": [],
+                          "externalReferences": {
+                            "connection": "c5a2a566-5e67-46b1-b643-c2676b395009"
+                          },
+                          "annotations": []
+                        }
+                      },
+                      "sink": {
+                        "type": "ParquetSink",
+                        "formatSettings": {
+                          "type": "ParquetWriteSettings",
+                          "enableVertiParquet": true
+                        },
+                        "storeSettings": {
+                          "type": "AzureBlobStorageWriteSettings"
+                        },
+                        "datasetSettings": {
+                          "type": "Parquet",
+                          "typeProperties": {
+                            "location": {
+                              "type": "LakehouseLocation",
+                              "folderPath": {
+                                "value": "@item().SinkPath",
+                                "type": "Expression"
+                              },
+                              "fileName": {
+                                "value": "@concat(item().TableName,'.parquet')",
+                                "type": "Expression"
+                              }
+                            },
+                            "compressionCodec": "snappy"
+                          },
+                          "schema": [],
+                          "linkedService": {
+                            "name": "AdvWrk_LKH",
+                            "properties": {
+                              "type": "Lakehouse",
+                              "typeProperties": {
+                                "artifactId": "4aa0f858-f98f-9c2a-4f9f-16469eb80d3a",
+                                "workspaceId": "00000000-0000-0000-0000-000000000000",
+                                "rootFolder": "Files"
+                              },
+                              "annotations": []
+                            }
+                          },
+                          "annotations": []
+                        }
+                      },
+                      "translator": {
+                        "type": "TabularTranslator",
+                        "typeConversion": true,
+                        "typeConversionSettings": {
+                          "allowDataTruncation": true,
+                          "treatBooleanAsNumber": false
+                        }
+                      },
+                      "enableStaging": false
+                    },
+                    "policy": {
+                      "timeout": "0.12:00:00",
+                      "retry": 0,
+                      "retryIntervalInSeconds": 30,
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "onprem_to_onelake_copy1_copy1_copy1",
+                    "dependsOn": []
+                  }
+                ],
+                "ifFalseActivities": []
+              },
+              "name": "If Condition1_copy1_copy1_copy1",
+              "dependsOn": []
+            }
+          ]
+        },
+        "name": "all_person_tbls",
+        "dependsOn": [
+          {
+            "activity": "ingest_person",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          },
+          {
+            "activity": "current_timestamp_person",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "SqlServerSource",
+            "sqlReaderQuery": {
+              "value": "SELECT * FROM AdvWrk_LKH.dbo.ingestionconfig\nWHERE SchemaName = 'Production'\nAND\nIsActive = 1",
+              "type": "Expression"
+            },
+            "partitionOption": "None",
+            "queryTimeout": "02:00:00"
+          },
+          "datasetSettings": {
+            "type": "SqlServerTable",
+            "typeProperties": {
+              "database": "AdvWrk_LKH"
+            },
+            "schema": [],
+            "externalReferences": {
+              "connection": "2d65571c-d063-4072-97e3-ef2c1062f3d0"
+            },
+            "annotations": []
+          },
+          "firstRowOnly": false
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "ingest_production",
+        "state": "Inactive",
+        "onInactiveMarkAs": "Succeeded",
+        "dependsOn": [
+          {
+            "activity": "all_person_tbls",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "SetVariable",
+        "typeProperties": {
+          "variableName": "current_timestamp",
+          "value": {
+            "value": "@utcNow()",
+            "type": "Expression"
+          }
+        },
+        "policy": {
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "current_timestamp_production",
+        "dependsOn": [
+          {
+            "activity": "all_person_tbls",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "ForEach",
+        "typeProperties": {
+          "items": {
+            "value": "@activity('ingest_production').output.value",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "type": "IfCondition",
+              "typeProperties": {
+                "expression": {
+                  "value": "@equals(item().IsActive,true) ",
+                  "type": "Expression"
+                },
+                "ifTrueActivities": [
+                  {
+                    "type": "Copy",
+                    "typeProperties": {
+                      "source": {
+                        "type": "SqlServerSource",
+                        "sqlReaderQuery": {
+                          "value": "SELECT * FROM @{item().SchemaName}.@{item().TableName}",
+                          "type": "Expression"
+                        },
+                        "partitionOption": "None",
+                        "queryTimeout": "02:00:00",
+                        "datasetSettings": {
+                          "type": "SqlServerTable",
+                          "typeProperties": {
+                            "database": "AdventureWorks"
+                          },
+                          "schema": [],
+                          "externalReferences": {
+                            "connection": "c5a2a566-5e67-46b1-b643-c2676b395009"
+                          },
+                          "annotations": []
+                        }
+                      },
+                      "sink": {
+                        "type": "ParquetSink",
+                        "formatSettings": {
+                          "type": "ParquetWriteSettings",
+                          "enableVertiParquet": true
+                        },
+                        "storeSettings": {
+                          "type": "LakehouseWriteSettings"
+                        },
+                        "datasetSettings": {
+                          "type": "Parquet",
+                          "typeProperties": {
+                            "location": {
+                              "type": "LakehouseLocation",
+                              "folderPath": {
+                                "value": "@item().SinkPath",
+                                "type": "Expression"
+                              },
+                              "fileName": {
+                                "value": "@concat(item().TableName,'.parquet')",
+                                "type": "Expression"
+                              }
+                            },
+                            "compressionCodec": "snappy"
+                          },
+                          "schema": [],
+                          "linkedService": {
+                            "name": "AdvWrk_LKH",
+                            "properties": {
+                              "type": "Lakehouse",
+                              "typeProperties": {
+                                "artifactId": "9eb80d3a-1646-4f9f-9c2a-f98f4aa0f858",
+                                "workspaceId": "39569afe-3f7e-4b65-8e1e-0e502ac5b583",
+                                "rootFolder": "Files"
+                              },
+                              "annotations": []
+                            }
+                          },
+                          "annotations": []
+                        }
+                      },
+                      "translator": {
+                        "type": "TabularTranslator",
+                        "typeConversion": true,
+                        "typeConversionSettings": {
+                          "allowDataTruncation": true,
+                          "treatBooleanAsNumber": false
+                        }
+                      },
+                      "enableStaging": false
+                    },
+                    "policy": {
+                      "timeout": "0.12:00:00",
+                      "retry": 0,
+                      "retryIntervalInSeconds": 30,
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "onprem_to_onelake_copy1_copy1_copy1_copy1",
+                    "dependsOn": []
+                  }
+                ],
+                "ifFalseActivities": []
+              },
+              "name": "If Condition1_copy1_copy1_copy1_copy1",
+              "dependsOn": []
+            }
+          ]
+        },
+        "name": "all_production_tbls",
+        "state": "Inactive",
+        "onInactiveMarkAs": "Succeeded",
+        "dependsOn": [
+          {
+            "activity": "ingest_production",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          },
+          {
+            "activity": "current_timestamp_production",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      }
+    ],
+    "variables": {
+      "current_timestamp": {
+        "type": "String"
+      }
+    }
+  }
+}

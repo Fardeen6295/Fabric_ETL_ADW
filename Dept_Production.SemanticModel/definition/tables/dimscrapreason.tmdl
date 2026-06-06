@@ -1,0 +1,99 @@
+table dimscrapreason
+	lineageTag: f00e7ee6-b60a-4805-9615-e646593ebc8c
+	sourceLineageTag: [gold].[dimscrapreason]
+
+	column ScrapReasonID
+		dataType: int64
+		formatString: 0
+		lineageTag: 4858d448-d58a-41e0-8090-dfb7f31768dc
+		sourceLineageTag: ScrapReasonID
+		summarizeBy: none
+		sourceColumn: ScrapReasonID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ScrapReason
+		dataType: string
+		lineageTag: 2fefc4c5-e520-432e-9cbe-8cef2cdab8c6
+		sourceLineageTag: ScrapReason
+		summarizeBy: none
+		sourceColumn: ScrapReason
+
+		annotation SummarizationSetBy = Automatic
+
+	column ModifiedAt
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 2364545b-4690-4779-b0b0-52af8577d95e
+		sourceLineageTag: ModifiedAt
+		summarizeBy: none
+		sourceColumn: ModifiedAt
+
+		annotation SummarizationSetBy = Automatic
+
+	column StartDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c60b5ebc-1f8c-4a31-a0c2-4709b533ce0b
+		sourceLineageTag: StartDate
+		summarizeBy: none
+		sourceColumn: StartDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column EndDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e1af6bcd-0bd7-48c9-a2f4-ce9b971b254b
+		sourceLineageTag: EndDate
+		summarizeBy: none
+		sourceColumn: EndDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsCurrent
+		dataType: string
+		lineageTag: d538f545-f688-4e8c-8f90-cea601916bba
+		sourceLineageTag: IsCurrent
+		summarizeBy: none
+		sourceColumn: IsCurrent
+
+		annotation SummarizationSetBy = Automatic
+
+	column DimScrapReasonKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 7a2f4b8e-e430-4f04-97b7-24bc2cc8134c
+		sourceLineageTag: DimScrapReasonKey
+		summarizeBy: none
+		sourceColumn: DimScrapReasonKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column CreatedDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 666729ab-ea60-4077-8c8d-95532395b813
+		sourceLineageTag: CreatedDate
+		summarizeBy: none
+		sourceColumn: CreatedDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column UpdatedDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: fa0dc35d-21e5-4a17-aa50-41102bea1c11
+		sourceLineageTag: UpdatedDate
+		summarizeBy: none
+		sourceColumn: UpdatedDate
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dimscrapreason = entity
+		mode: directLake
+		source
+			entityName: dimscrapreason
+			schemaName: gold
+			expressionSource: 'DirectLake - AdvWrk_LKH'
+

@@ -1,0 +1,292 @@
+table dimproduct
+	lineageTag: 302b6f9e-ad8e-4f08-943e-97eb02b3878e
+	sourceLineageTag: [gold].[dimproduct]
+
+	column ProductID
+		dataType: int64
+		formatString: 0
+		lineageTag: 065b2044-be09-40dd-ba69-799395d72c1a
+		sourceLineageTag: ProductID
+		summarizeBy: count
+		sourceColumn: ProductID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductName
+		dataType: string
+		lineageTag: dd8dd5e5-2e0b-4f5b-9743-d9f350e2c8a8
+		sourceLineageTag: ProductName
+		summarizeBy: none
+		sourceColumn: ProductName
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductNumber
+		dataType: string
+		lineageTag: 08d568b9-82d6-4ca5-ac4b-1d20d7068725
+		sourceLineageTag: ProductNumber
+		summarizeBy: none
+		sourceColumn: ProductNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column MakeFlag
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 50e45ec6-f347-4f79-8b0f-942e5bb289fa
+		sourceLineageTag: MakeFlag
+		summarizeBy: none
+		sourceColumn: MakeFlag
+
+		annotation SummarizationSetBy = Automatic
+
+	column FinishedGoodsFlag
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: d241ed4f-a20b-42c8-8367-3b5892e7346e
+		sourceLineageTag: FinishedGoodsFlag
+		summarizeBy: none
+		sourceColumn: FinishedGoodsFlag
+
+		annotation SummarizationSetBy = Automatic
+
+	column Color
+		dataType: string
+		lineageTag: 13718f82-4608-41ce-bf91-edc18647808b
+		sourceLineageTag: Color
+		summarizeBy: none
+		sourceColumn: Color
+
+		annotation SummarizationSetBy = Automatic
+
+	column SafetyStockLevel
+		dataType: int64
+		formatString: 0
+		lineageTag: 0842f15d-51d4-481b-a429-69731a7cb8d7
+		sourceLineageTag: SafetyStockLevel
+		summarizeBy: sum
+		sourceColumn: SafetyStockLevel
+
+		annotation SummarizationSetBy = Automatic
+
+	column ReorderPoint
+		dataType: int64
+		formatString: 0
+		lineageTag: a90466c2-f09a-4b90-b6fc-4d8edd1df1c3
+		sourceLineageTag: ReorderPoint
+		summarizeBy: sum
+		sourceColumn: ReorderPoint
+
+		annotation SummarizationSetBy = Automatic
+
+	column StandardCost
+		dataType: double
+		lineageTag: b2d71ad5-bc3a-40ec-8a7c-b33928d23dc5
+		sourceLineageTag: StandardCost
+		summarizeBy: sum
+		sourceColumn: StandardCost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ListPrice
+		dataType: double
+		lineageTag: 7cdad249-3d9c-4e78-82ff-50a7a4b9a3b0
+		sourceLineageTag: ListPrice
+		summarizeBy: sum
+		sourceColumn: ListPrice
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Size
+		dataType: string
+		lineageTag: ece5ff3d-409c-48f1-bdd1-b2cd5b89497d
+		sourceLineageTag: Size
+		summarizeBy: none
+		sourceColumn: Size
+
+		annotation SummarizationSetBy = Automatic
+
+	column SizeUnitMeasureCode
+		dataType: string
+		lineageTag: 9fd05852-0737-4263-ace1-8c65fef807c1
+		sourceLineageTag: SizeUnitMeasureCode
+		summarizeBy: none
+		sourceColumn: SizeUnitMeasureCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeightUnitMeasureCode
+		dataType: string
+		lineageTag: adbc7663-7ee7-4ff3-84b4-1e8dac8e06c6
+		sourceLineageTag: WeightUnitMeasureCode
+		summarizeBy: none
+		sourceColumn: WeightUnitMeasureCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column Weight
+		dataType: decimal
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: ea6174d9-5233-4ca4-bd4d-1906bef51651
+		sourceLineageTag: Weight
+		summarizeBy: sum
+		sourceColumn: Weight
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column DaysToManufacture
+		dataType: int64
+		formatString: 0
+		lineageTag: da02f2c2-11da-4f7a-ba65-1ebecf791f49
+		sourceLineageTag: DaysToManufacture
+		summarizeBy: sum
+		sourceColumn: DaysToManufacture
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductLine
+		dataType: string
+		lineageTag: 144d1b25-c141-4e53-95be-24e68b0df2cb
+		sourceLineageTag: ProductLine
+		summarizeBy: none
+		sourceColumn: ProductLine
+
+		annotation SummarizationSetBy = Automatic
+
+	column Class
+		dataType: string
+		lineageTag: 0326f28e-4e02-4701-9adc-f5e9cbece9f5
+		sourceLineageTag: Class
+		summarizeBy: none
+		sourceColumn: Class
+
+		annotation SummarizationSetBy = Automatic
+
+	column Style
+		dataType: string
+		lineageTag: f647dccf-acdd-480b-b410-665c7ac3b40e
+		sourceLineageTag: Style
+		summarizeBy: none
+		sourceColumn: Style
+
+		annotation SummarizationSetBy = Automatic
+
+	column DiscontinuedDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 6d687661-8665-442f-a39b-d29b02d755e8
+		sourceLineageTag: DiscontinuedDate
+		summarizeBy: none
+		sourceColumn: DiscontinuedDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductSubCategoryName
+		dataType: string
+		lineageTag: d760b428-c824-4760-8e96-3d3b242c27d1
+		sourceLineageTag: ProductSubCategoryName
+		summarizeBy: none
+		sourceColumn: ProductSubCategoryName
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductCategoryName
+		dataType: string
+		lineageTag: 55cfbedd-505b-41fe-99ca-de46a58b9d3f
+		sourceLineageTag: ProductCategoryName
+		summarizeBy: none
+		sourceColumn: ProductCategoryName
+
+		annotation SummarizationSetBy = Automatic
+
+	column ModelName
+		dataType: string
+		lineageTag: 1d928d73-9874-4640-a052-1c387c081a6d
+		sourceLineageTag: ModelName
+		summarizeBy: none
+		sourceColumn: ModelName
+
+		annotation SummarizationSetBy = Automatic
+
+	column ModifiedAt
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 9bb61b2c-957f-4fcf-8c22-2a30ff00c176
+		sourceLineageTag: ModifiedAt
+		summarizeBy: none
+		sourceColumn: ModifiedAt
+
+		annotation SummarizationSetBy = Automatic
+
+	column StartDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 0142ffc3-0db4-464c-868e-174bb9a0d483
+		sourceLineageTag: StartDate
+		summarizeBy: none
+		sourceColumn: StartDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column EndDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 7ea873e2-f55d-4288-8a83-7f59be96260a
+		sourceLineageTag: EndDate
+		summarizeBy: none
+		sourceColumn: EndDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsCurrent
+		dataType: string
+		lineageTag: 17e8cb0d-272d-4718-a214-2e11e9a03a0c
+		sourceLineageTag: IsCurrent
+		summarizeBy: none
+		sourceColumn: IsCurrent
+
+		annotation SummarizationSetBy = Automatic
+
+	column DimProductKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 0967eea0-dac7-47ed-8aef-6171820b34e7
+		sourceLineageTag: DimProductKey
+		summarizeBy: none
+		sourceColumn: DimProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column CreatedDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 40aa1285-7aca-482f-8311-bce51f456652
+		sourceLineageTag: CreatedDate
+		summarizeBy: none
+		sourceColumn: CreatedDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column UpdatedDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c6fce368-14e9-46d2-b326-e91c2deabd0f
+		sourceLineageTag: UpdatedDate
+		summarizeBy: none
+		sourceColumn: UpdatedDate
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dimproduct = entity
+		mode: directLake
+		source
+			entityName: dimproduct
+			schemaName: gold
+			expressionSource: 'DirectLake - AdvWrk_LKH'
+

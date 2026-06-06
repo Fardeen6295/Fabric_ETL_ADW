@@ -1,0 +1,111 @@
+table factproductionorder
+	lineageTag: 87111648-f62f-47a3-98a2-d79c43b073f1
+	sourceLineageTag: [gold].[factproductionorder]
+
+	column WorkOrderID
+		dataType: int64
+		formatString: 0
+		lineageTag: bf119b31-9c6f-4648-aada-63be2691763c
+		sourceLineageTag: WorkOrderID
+		summarizeBy: count
+		sourceColumn: WorkOrderID
+
+		annotation SummarizationSetBy = Automatic
+
+	column OrderQty
+		dataType: int64
+		formatString: 0
+		lineageTag: e5005266-0f04-403b-8fee-1b1fc52ca70a
+		sourceLineageTag: OrderQty
+		summarizeBy: sum
+		sourceColumn: OrderQty
+
+		annotation SummarizationSetBy = Automatic
+
+	column StockedQty
+		dataType: int64
+		formatString: 0
+		lineageTag: 8ae83943-7748-4949-a623-0437e14391c4
+		sourceLineageTag: StockedQty
+		summarizeBy: sum
+		sourceColumn: StockedQty
+
+		annotation SummarizationSetBy = Automatic
+
+	column ScrappedQty
+		dataType: int64
+		formatString: 0
+		lineageTag: b53abd3b-9727-4e0d-adb7-f6d676fd5106
+		sourceLineageTag: ScrappedQty
+		summarizeBy: sum
+		sourceColumn: ScrappedQty
+
+		annotation SummarizationSetBy = Automatic
+
+	column StartDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 53110071-3766-4a1d-b616-efc1cda3a5b4
+		sourceLineageTag: StartDate
+		summarizeBy: none
+		sourceColumn: StartDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column EndDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: fc9b51b8-3141-4241-903f-be1f9938568e
+		sourceLineageTag: EndDate
+		summarizeBy: none
+		sourceColumn: EndDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column DueDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: f8e217b8-0ea3-40fe-9db5-2fe3b45d2df1
+		sourceLineageTag: DueDate
+		summarizeBy: none
+		sourceColumn: DueDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column ModifiedDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 1af12d57-a2cd-438d-a90a-e58f35d08db5
+		sourceLineageTag: ModifiedDate
+		summarizeBy: none
+		sourceColumn: ModifiedDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column DimProductKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 8d925d9a-03fe-42c5-b9af-f62b24de5da9
+		sourceLineageTag: DimProductKey
+		summarizeBy: none
+		sourceColumn: DimProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column DimScrapReasonKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 6a7be344-389d-48e5-81e7-258b4dc18ee6
+		sourceLineageTag: DimScrapReasonKey
+		summarizeBy: none
+		sourceColumn: DimScrapReasonKey
+
+		annotation SummarizationSetBy = Automatic
+
+	partition factproductionorder = entity
+		mode: directLake
+		source
+			entityName: factproductionorder
+			schemaName: gold
+			expressionSource: 'DirectLake - AdvWrk_LKH'
+

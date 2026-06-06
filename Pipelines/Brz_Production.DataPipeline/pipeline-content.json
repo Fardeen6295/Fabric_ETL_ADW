@@ -1,0 +1,425 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "SqlServerSource",
+            "sqlReaderQuery": {
+              "value": "SELECT * FROM AdvWrk_LKH.dbo.ingestionconfig WHERE SchemaName = 'Production' AND IsActive = 1",
+              "type": "Expression"
+            },
+            "partitionOption": "None",
+            "queryTimeout": "02:00:00"
+          },
+          "datasetSettings": {
+            "type": "SqlServerTable",
+            "typeProperties": {
+              "schema": "dbo",
+              "table": "ingestionconfig",
+              "database": "AdvWrk_LKH"
+            },
+            "schema": [],
+            "externalReferences": {
+              "connection": "26adc718-3b3a-44e2-9b7a-05916f880171"
+            },
+            "annotations": []
+          },
+          "firstRowOnly": false
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "GetTablesMetadata",
+        "dependsOn": []
+      },
+      {
+        "type": "ForEach",
+        "typeProperties": {
+          "isSequential": true,
+          "items": {
+            "value": "@activity('GetTablesMetadata').output.value",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "type": "Script",
+              "typeProperties": {
+                "database": "AdventureWorks",
+                "scripts": [
+                  {
+                    "text": {
+                      "value": "SELECT COUNT(*) cnt FROM AdventureWorks.@{item().SchemaName}.@{item().TableName} WHERE @{item().CdcCol} > '@{activity('LastLoadDate').output.value[0].cdc}'",
+                      "type": "Expression"
+                    },
+                    "type": "Query"
+                  }
+                ],
+                "scriptBlockExecutionTimeout": "02:00:00"
+              },
+              "externalReferences": {
+                "connection": "c5a2a566-5e67-46b1-b643-c2676b395009"
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Records",
+              "dependsOn": [
+                {
+                  "activity": "LastLoadDate",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Lookup",
+              "typeProperties": {
+                "source": {
+                  "type": "JsonSource",
+                  "formatSettings": {
+                    "type": "JsonReadSettings"
+                  },
+                  "storeSettings": {
+                    "type": "LakehouseReadSettings",
+                    "recursive": true,
+                    "enablePartitionDiscovery": false
+                  }
+                },
+                "datasetSettings": {
+                  "type": "Json",
+                  "typeProperties": {
+                    "location": {
+                      "type": "LakehouseLocation",
+                      "folderPath": "monitor",
+                      "fileName": {
+                        "value": "@concat(item().SchemaName, '/', item().TableName, '/', 'cdc.json')",
+                        "type": "Expression"
+                      }
+                    }
+                  },
+                  "schema": {},
+                  "linkedService": {
+                    "name": "AdvWrk_LKH",
+                    "properties": {
+                      "type": "Lakehouse",
+                      "typeProperties": {
+                        "artifactId": "4aa0f858-f98f-9c2a-4f9f-16469eb80d3a",
+                        "workspaceId": "00000000-0000-0000-0000-000000000000",
+                        "rootFolder": "Files"
+                      },
+                      "annotations": []
+                    }
+                  },
+                  "annotations": []
+                },
+                "firstRowOnly": false
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "LastLoadDate",
+              "dependsOn": []
+            },
+            {
+              "type": "IfCondition",
+              "typeProperties": {
+                "expression": {
+                  "value": "@greater(activity('Records').output.resultSets[0].rows[0].cnt, 0)",
+                  "type": "Expression"
+                },
+                "ifTrueActivities": [
+                  {
+                    "type": "Copy",
+                    "typeProperties": {
+                      "source": {
+                        "type": "SqlServerSource",
+                        "sqlReaderQuery": {
+                          "value": "SELECT * FROM AdventureWorks.@{item().SchemaName}.@{item().TableName} WHERE @{item().CdcCol} > '@{activity('LastLoadDate').output.value[0].cdc}'",
+                          "type": "Expression"
+                        },
+                        "partitionOption": "None",
+                        "queryTimeout": "02:00:00",
+                        "datasetSettings": {
+                          "type": "SqlServerTable",
+                          "typeProperties": {
+                            "database": "AdventureWorks"
+                          },
+                          "schema": [],
+                          "externalReferences": {
+                            "connection": "c5a2a566-5e67-46b1-b643-c2676b395009"
+                          },
+                          "annotations": []
+                        }
+                      },
+                      "sink": {
+                        "type": "ParquetSink",
+                        "formatSettings": {
+                          "type": "ParquetWriteSettings",
+                          "enableVertiParquet": true
+                        },
+                        "storeSettings": {
+                          "type": "AzureBlobStorageWriteSettings"
+                        },
+                        "datasetSettings": {
+                          "type": "Parquet",
+                          "typeProperties": {
+                            "location": {
+                              "type": "AzureBlobStorageLocation",
+                              "container": "bronze",
+                              "folderPath": {
+                                "value": "@concat(item().SchemaName,'/',item().TableName)",
+                                "type": "Expression"
+                              },
+                              "fileName": {
+                                "value": "@concat(item().TableName, '.parquet')",
+                                "type": "Expression"
+                              }
+                            },
+                            "compressionCodec": "snappy"
+                          },
+                          "schema": [],
+                          "linkedService": {
+                            "name": "AdvWrk_LKH",
+                            "properties": {
+                              "type": "Lakehouse",
+                              "typeProperties": {
+                                "artifactId": "4aa0f858-f98f-9c2a-4f9f-16469eb80d3a",
+                                "workspaceId": "00000000-0000-0000-0000-000000000000",
+                                "rootFolder": "Files"
+                              },
+                              "annotations": []
+                            }
+                          },
+                          "annotations": []
+                        }
+                      },
+                      "translator": {
+                        "type": "TabularTranslator",
+                        "typeConversion": true,
+                        "typeConversionSettings": {
+                          "allowDataTruncation": true,
+                          "treatBooleanAsNumber": false
+                        }
+                      },
+                      "enableStaging": false
+                    },
+                    "policy": {
+                      "timeout": "0.12:00:00",
+                      "retry": 0,
+                      "retryIntervalInSeconds": 30,
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "CopyData",
+                    "dependsOn": []
+                  },
+                  {
+                    "type": "Script",
+                    "typeProperties": {
+                      "database": "AdventureWorks",
+                      "scripts": [
+                        {
+                          "text": {
+                            "value": "SELECT MAX(@{item().CdcCol}) newdate FROM AdventureWorks.@{item().SchemaName}.@{item().TableName} ",
+                            "type": "Expression"
+                          },
+                          "type": "Query"
+                        }
+                      ],
+                      "scriptBlockExecutionTimeout": "02:00:00"
+                    },
+                    "externalReferences": {
+                      "connection": "c5a2a566-5e67-46b1-b643-c2676b395009"
+                    },
+                    "policy": {
+                      "timeout": "0.12:00:00",
+                      "retry": 0,
+                      "retryIntervalInSeconds": 30,
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "NewMaxDate",
+                    "dependsOn": [
+                      {
+                        "activity": "CopyData",
+                        "dependencyConditions": [
+                          "Succeeded"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "Copy",
+                    "typeProperties": {
+                      "source": {
+                        "type": "JsonSource",
+                        "formatSettings": {
+                          "type": "JsonReadSettings"
+                        },
+                        "additionalColumns": [
+                          {
+                            "name": "cdc",
+                            "value": {
+                              "value": "@activity('NewMaxDate').output.resultSets[0].rows[0].newdate",
+                              "type": "Expression"
+                            }
+                          }
+                        ],
+                        "storeSettings": {
+                          "type": "AzureBlobStorageReadSettings",
+                          "recursive": true,
+                          "enablePartitionDiscovery": false
+                        },
+                        "datasetSettings": {
+                          "type": "Json",
+                          "typeProperties": {
+                            "location": {
+                              "type": "LakehouseLocation",
+                              "folderPath": "monitor",
+                              "fileName": {
+                                "value": "@concat(item().SchemaName, '/' , item().TableName, '/', 'empty.json')",
+                                "type": "Expression"
+                              }
+                            }
+                          },
+                          "schema": {},
+                          "linkedService": {
+                            "name": "AdvWrk_LKH",
+                            "properties": {
+                              "type": "Lakehouse",
+                              "typeProperties": {
+                                "artifactId": "4aa0f858-f98f-9c2a-4f9f-16469eb80d3a",
+                                "workspaceId": "00000000-0000-0000-0000-000000000000",
+                                "rootFolder": "Files"
+                              },
+                              "annotations": []
+                            }
+                          },
+                          "annotations": []
+                        }
+                      },
+                      "sink": {
+                        "type": "JsonSink",
+                        "formatSettings": {
+                          "type": "JsonWriteSettings"
+                        },
+                        "storeSettings": {
+                          "type": "AzureBlobStorageWriteSettings"
+                        },
+                        "datasetSettings": {
+                          "type": "Json",
+                          "typeProperties": {
+                            "location": {
+                              "type": "LakehouseLocation",
+                              "folderPath": "monitor",
+                              "fileName": {
+                                "value": "@concat(item().SchemaName, '/', item().TableName, '/', 'cdc.json')",
+                                "type": "Expression"
+                              }
+                            }
+                          },
+                          "schema": {},
+                          "linkedService": {
+                            "name": "AdvWrk_LKH",
+                            "properties": {
+                              "type": "Lakehouse",
+                              "typeProperties": {
+                                "artifactId": "4aa0f858-f98f-9c2a-4f9f-16469eb80d3a",
+                                "workspaceId": "00000000-0000-0000-0000-000000000000",
+                                "rootFolder": "Files"
+                              },
+                              "annotations": []
+                            }
+                          },
+                          "annotations": []
+                        }
+                      },
+                      "enableStaging": false
+                    },
+                    "policy": {
+                      "timeout": "0.12:00:00",
+                      "retry": 0,
+                      "retryIntervalInSeconds": 30,
+                      "secureInput": false,
+                      "secureOutput": false
+                    },
+                    "name": "UpdateLastCdc",
+                    "dependsOn": [
+                      {
+                        "activity": "NewMaxDate",
+                        "dependencyConditions": [
+                          "Succeeded"
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "ifFalseActivities": []
+              },
+              "name": "ForNewData",
+              "dependsOn": [
+                {
+                  "activity": "Records",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "name": "ForSalesTables",
+        "dependsOn": [
+          {
+            "activity": "GetTablesMetadata",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          },
+          {
+            "activity": "current_timestamp",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "SetVariable",
+        "typeProperties": {
+          "variableName": "current_timestamp",
+          "value": {
+            "value": "@utcNow()",
+            "type": "Expression"
+          }
+        },
+        "policy": {
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "current_timestamp",
+        "dependsOn": []
+      }
+    ],
+    "variables": {
+      "current_timestamp": {
+        "type": "String"
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "Brz_Purchasing"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "30f2454c-c276-89b6-4d69-bf019757f056"
+  }
+}

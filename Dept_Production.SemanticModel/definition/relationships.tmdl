@@ -1,0 +1,20 @@
+relationship 6f311dac-ab02-baac-3c36-cc48372e7ba3
+	fromColumn: factproductionorder.DimProductKey
+	toColumn: dimproduct.DimProductKey
+
+relationship 3b649e0e-0cba-2912-0807-408458e6d094
+	fromColumn: factproductionorder.DimScrapReasonKey
+	toColumn: dimscrapreason.DimScrapReasonKey
+
+relationship 59ff0dda-8724-2bc6-58a6-e37c06110b0b
+	fromColumn: factproductionorderrouting.DimLocationKey
+	toColumn: dimlocation.DimLocationKey
+
+relationship 21817118-15f0-04ac-c56d-bff3ac72aba1
+	fromColumn: factproductionorderrouting.DimProductKey
+	toColumn: dimproduct.DimProductKey
+
+relationship 254fc028-d9f5-9fc8-6405-e3055ddb55d4
+	fromColumn: facttransactionhistory.DimProductKey
+	toColumn: dimproduct.DimProductKey
+

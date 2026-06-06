@@ -1,0 +1,123 @@
+table dimlocation
+	lineageTag: 28d8c0cd-9cf8-406a-915a-3618783dd8cc
+	sourceLineageTag: [gold].[dimlocation]
+
+	column LocationID
+		dataType: int64
+		formatString: 0
+		lineageTag: a4caebed-2a30-4078-9ba5-3de8431a54a4
+		sourceLineageTag: LocationID
+		summarizeBy: none
+		sourceColumn: LocationID
+
+		annotation SummarizationSetBy = Automatic
+
+	column LocationName
+		dataType: string
+		lineageTag: d213ed70-ab35-412f-b966-b54096c098f0
+		sourceLineageTag: LocationName
+		summarizeBy: none
+		sourceColumn: LocationName
+
+		annotation SummarizationSetBy = Automatic
+
+	column CostRate
+		dataType: decimal
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: a60902aa-2b97-4e25-9794-f0ec32c0c59e
+		sourceLineageTag: CostRate
+		summarizeBy: none
+		sourceColumn: CostRate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column Availability
+		dataType: decimal
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: cc137ea7-9184-4364-a615-c1fb8256430e
+		sourceLineageTag: Availability
+		summarizeBy: none
+		sourceColumn: Availability
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column ModifiedAt
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 60f47a49-83be-4cfc-9ce0-a3de91cbadcc
+		sourceLineageTag: ModifiedAt
+		summarizeBy: none
+		sourceColumn: ModifiedAt
+
+		annotation SummarizationSetBy = Automatic
+
+	column StartDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 95ae8e1e-47e3-4cad-a9e4-2acaec1aa977
+		sourceLineageTag: StartDate
+		summarizeBy: none
+		sourceColumn: StartDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column EndDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 93bd6a93-f39a-403a-bc30-ef88973313cc
+		sourceLineageTag: EndDate
+		summarizeBy: none
+		sourceColumn: EndDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsCurrent
+		dataType: string
+		lineageTag: d2b83107-4c34-4122-a492-6a663ce1cb54
+		sourceLineageTag: IsCurrent
+		summarizeBy: none
+		sourceColumn: IsCurrent
+
+		annotation SummarizationSetBy = Automatic
+
+	column DimLocationKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 24378bb0-d427-4b08-b9dc-826b8e26eea0
+		sourceLineageTag: DimLocationKey
+		summarizeBy: none
+		sourceColumn: DimLocationKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column CreatedDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 4072a95b-fab4-4df9-82fd-be83708dbf05
+		sourceLineageTag: CreatedDate
+		summarizeBy: none
+		sourceColumn: CreatedDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column UpdatedDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: fa56be65-eb34-4be5-ab30-309cf3575bd1
+		sourceLineageTag: UpdatedDate
+		summarizeBy: none
+		sourceColumn: UpdatedDate
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dimlocation = entity
+		mode: directLake
+		source
+			entityName: dimlocation
+			schemaName: gold
+			expressionSource: 'DirectLake - AdvWrk_LKH'
+

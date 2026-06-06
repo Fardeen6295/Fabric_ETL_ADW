@@ -1,0 +1,101 @@
+table facttransactionhistory
+	lineageTag: afdd4452-5d1b-4d77-a11e-d174276812a1
+	sourceLineageTag: [gold].[facttransactionhistory]
+
+	column TransactionID
+		dataType: int64
+		formatString: 0
+		lineageTag: 832cec0f-cc46-482c-ba1f-3652c780d786
+		sourceLineageTag: TransactionID
+		summarizeBy: count
+		sourceColumn: TransactionID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ReferenceOrderID
+		dataType: int64
+		formatString: 0
+		lineageTag: 09eebd4d-caf9-48a9-a9cd-cb817f194b6c
+		sourceLineageTag: ReferenceOrderID
+		summarizeBy: count
+		sourceColumn: ReferenceOrderID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ReferenceOrderLineID
+		dataType: int64
+		formatString: 0
+		lineageTag: fa37de41-ea37-4716-9ae8-141fb8255470
+		sourceLineageTag: ReferenceOrderLineID
+		summarizeBy: count
+		sourceColumn: ReferenceOrderLineID
+
+		annotation SummarizationSetBy = Automatic
+
+	column TransactionDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 45de6b33-631b-4d93-a89f-4c2cc12710a0
+		sourceLineageTag: TransactionDate
+		summarizeBy: none
+		sourceColumn: TransactionDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column TransactionType
+		dataType: string
+		lineageTag: 0e1102bc-fa9e-4339-8458-8176653ce962
+		sourceLineageTag: TransactionType
+		summarizeBy: none
+		sourceColumn: TransactionType
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quantity
+		dataType: int64
+		formatString: 0
+		lineageTag: a578395a-438c-46fd-a634-c0eb73fb23c9
+		sourceLineageTag: Quantity
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column ActualCost
+		dataType: double
+		lineageTag: 3035694e-af3e-4381-af6e-2beda42ecfec
+		sourceLineageTag: ActualCost
+		summarizeBy: sum
+		sourceColumn: ActualCost
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ModifiedDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: c780c119-690e-4156-8534-7c8bc6414361
+		sourceLineageTag: ModifiedDate
+		summarizeBy: none
+		sourceColumn: ModifiedDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column DimProductKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 7e41b046-69e9-4fb5-a1df-598fea73861a
+		sourceLineageTag: DimProductKey
+		summarizeBy: none
+		sourceColumn: DimProductKey
+
+		annotation SummarizationSetBy = Automatic
+
+	partition facttransactionhistory = entity
+		mode: directLake
+		source
+			entityName: facttransactionhistory
+			schemaName: gold
+			expressionSource: 'DirectLake - AdvWrk_LKH'
+
